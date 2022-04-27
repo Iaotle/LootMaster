@@ -2,11 +2,11 @@
 
 namespace DalamudPluginProjectTemplate.Attributes
 {
-  [AttributeUsage(AttributeTargets.Method)]
-  public class HelpMessageAttribute : Attribute
-  {
-    public string HelpMessage { get; }
+    [AttributeUsage(AttributeTargets.Method)]
+    public class HelpMessageAttribute : Attribute
+    {
+        public string HelpMessage { get; }
 
-    public HelpMessageAttribute(string helpMessage) => this.HelpMessage = helpMessage;
-  }
+        public HelpMessageAttribute(string helpMessage) => HelpMessage = helpMessage;
+    }
 }
