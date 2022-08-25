@@ -18,6 +18,11 @@ namespace DalamudPluginProjectTemplate
                 ImGui.TableNextColumn();
                 ImGui.TextUnformatted("Roll need for everything. If impossible, roll greed.");
                 ImGui.TableNextColumn();
+                ImGui.TableNextColumn();
+                ImGui.TextUnformatted("/needobly");
+                ImGui.TableNextColumn();
+                ImGui.TextUnformatted("Roll need for everything. If impossible, roll pass.");
+                ImGui.TableNextColumn();
                 ImGui.TextUnformatted("/greed");
                 ImGui.TableNextColumn();
                 ImGui.TextUnformatted("Greed on all items.");
