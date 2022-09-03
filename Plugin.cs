@@ -63,11 +63,12 @@ namespace DalamudPluginProjectTemplate
         }
 
         [Command("/need")]
-        [HelpMessage("Roll need for everything. If impossible, roll greed.")]
+        [HelpMessage("Roll need for everything. If impossible, roll greed. Else, roll pass")]
         public void NeedCommand(string command, string args)
         {
             int num1 = 0;
             int num2 = 0;
+            int num3 = 0;
             for (int index = 0; index < LootItems.Count; ++index)
             {
                 if (!LootItems[index].Rolled)
@@ -77,10 +78,15 @@ namespace DalamudPluginProjectTemplate
                         RollItem(RollOption.Need, index);
                         ++num1;
                     }
-                    else
+                    else if (!LootItems[index].Rolled)
                     {
                         RollItem(RollOption.Greed, index);
                         ++num2;
+                    }
+                    else
+                    {
+                        RollItem(RollOption.Pass, index);
+                        ++num3;
                     }
                 }
             }
@@ -97,14 +103,18 @@ namespace DalamudPluginProjectTemplate
                 new UIForegroundPayload(575),
                 new TextPayload(num2.ToString()),
                 new UIForegroundPayload(0),
-                new TextPayload(" item" + (num2 > 1 ? "s" : "") + ".")
+                new TextPayload(" item" + (num2 > 1 ? "s" : "") + ", pass "),
+                new UIForegroundPayload(575),
+                new TextPayload(num3.ToString()),
+                new UIForegroundPayload(0),
+                new TextPayload(" item" + (num3 > 1 ? "s" : "") + ".")
             };
             SeString seString = new(payloadList);
             chatGui.Print(seString);
         }
 
         [Command("/needonly")]
-        [HelpMessage("Roll need for everything. If impossible, roll greed.")]
+        [HelpMessage("Roll need for everything. If impossible, roll greed. Else, roll pass")]
         public void NeedOnlyCommand(string command, string args)
         {
             int num1 = 0;
@@ -130,7 +140,7 @@ namespace DalamudPluginProjectTemplate
             ChatGui chatGui = ChatGui;
             List<Payload> payloadList = new()
             {
-                new TextPayload("Need "),
+                new TextPayload("Need Only"),
                 new UIForegroundPayload(575),
                 new TextPayload(num1.ToString()),
                 new UIForegroundPayload(0),
@@ -148,12 +158,18 @@ namespace DalamudPluginProjectTemplate
         public void GreedCommand(string command, string args)
         {
             int num = 0;
+            int num1 = 0;
             for (int index = 0; index < LootItems.Count; ++index)
             {
                 if (!LootItems[index].Rolled)
                 {
                     RollItem(RollOption.Greed, index);
                     ++num;
+                }
+                else
+                {
+                    RollItem(RollOption.Pass, index);
+                    ++num1;
                 }
             }
             if (!config.EnableChatLogMessage)
@@ -165,7 +181,11 @@ namespace DalamudPluginProjectTemplate
                 new UIForegroundPayload(575),
                 new TextPayload(num.ToString()),
                 new UIForegroundPayload(0),
-                new TextPayload(" item" + (num > 1 ? "s" : "") + ".")
+                new TextPayload(" item" + (num > 1 ? "s" : "") + ", pass "),
+                new UIForegroundPayload(575),
+                new TextPayload(num.ToString()),
+                new UIForegroundPayload(0),
+                new TextPayload(" item" + (num1 > 1 ? "s" : "") + "."),
             };
             SeString seString = new(payloadList);
             chatGui.Print(seString);
