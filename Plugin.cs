@@ -78,7 +78,7 @@ namespace DalamudPluginProjectTemplate
                         RollItem(RollOption.Need, index);
                         ++num1;
                     }
-                    else if (!LootItems[index].Rolled)
+                    if (LootItems[index].RollState == RollState.UpToGreed)
                     {
                         RollItem(RollOption.Greed, index);
                         ++num2;
