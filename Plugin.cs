@@ -78,16 +78,16 @@ namespace DalamudPluginProjectTemplate
                         RollItem(RollOption.Need, index);
                         ++num1;
                     }
-                    if (LootItems[index].RollState == RollState.UpToGreed)
+                    else
                     {
                         RollItem(RollOption.Greed, index);
                         ++num2;
                     }
-                    else
-                    {
-                        RollItem(RollOption.Pass, index);
-                        ++num3;
-                    }
+                }
+                else
+                {
+                    RollItem(RollOption.Pass, index);
+                    ++num3;
                 }
             }
             if (!config.EnableChatLogMessage)
