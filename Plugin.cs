@@ -75,7 +75,7 @@ namespace DalamudPluginProjectTemplate
                     if (LootItems[index].RollState == RollState.UpToNeed && !LootItems[index].Rolled)
                     {
                         RollItem(RollOption.Need, index);
-                        await Task.Delay(1000);
+                        await Task.Delay(500);
                         if (LootItems[index].Rolled)
                         {
                             ++num1;
@@ -89,7 +89,7 @@ namespace DalamudPluginProjectTemplate
                     else if (LootItems[index].RollState == RollState.UpToGreed && !LootItems[index].Rolled)
                     {
                         RollItem(RollOption.Greed, index);
-                        await Task.Delay(1000);
+                        await Task.Delay(500);
                         if (LootItems[index].Rolled)
                         {
 
@@ -105,7 +105,7 @@ namespace DalamudPluginProjectTemplate
                     else
                     {
                         RollItem(RollOption.Pass, index);
-                        await Task.Delay(1000);
+                        await Task.Delay(500);
                         if (LootItems[index].Rolled)
                         {
                             ++num3;
@@ -138,7 +138,7 @@ namespace DalamudPluginProjectTemplate
 
         [Command("/needonly")]
         [HelpMessage("Roll need for everything. If impossible, roll greed. Else, roll pass")]
-        public void NeedOnlyCommand(string command, string args)
+        public async void NeedOnlyCommand(string command, string args)
         {
             int num1 = 0;
             int num2 = 0;
@@ -149,7 +149,16 @@ namespace DalamudPluginProjectTemplate
                     if (LootItems[index].RollState == RollState.UpToNeed)
                     {
                         RollItem(RollOption.Need, index);
-                        ++num1;
+                        await Task.Delay(500);
+                        if (LootItems[index].Rolled)
+                        {
+                            ++num1;
+                        }
+                        else
+                        {
+                            RollItem(RollOption.Pass, index);
+                            ++num2;
+                        }
                     }
                     else
                     {
@@ -180,7 +189,7 @@ namespace DalamudPluginProjectTemplate
 
         [Command("/greed")]
         [HelpMessage("Greed on all items.")]
-        public void GreedCommand(string command, string args)
+        public async void GreedCommand(string command, string args)
         {
             int num = 0;
             int num1 = 0;
@@ -189,11 +198,22 @@ namespace DalamudPluginProjectTemplate
                 if (!LootItems[index].Rolled)
                 {
                     RollItem(RollOption.Greed, index);
+                    await Task.Delay(500);
+                    if (LootItems[index].Rolled)
+                    {
+                        ++num;
+                    }
+                    else
+                    {
+                        RollItem(RollOption.Pass, index);
+                        ++num1;
+                    }
                 }
                 
                 else
                 {
                     RollItem(RollOption.Pass, index);
+                    ++num1;
                 }
             }
             if (!config.EnableChatLogMessage)
