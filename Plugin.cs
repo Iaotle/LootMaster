@@ -69,25 +69,45 @@ namespace DalamudPluginProjectTemplate
             int num1 = 0;
             int num2 = 0;
             int num3 = 0;
+            bool cantroll = false;
             for (int index = 0; index < LootItems.Count; ++index)
             {
                 if (!LootItems[index].Rolled)
                 {
-                    if (LootItems[index].RollState == RollState.UpToNeed)
+                    if (LootItems[index].RollState == RollState.UpToNeed && !LootItems[index].Rolled)
                     {
                         RollItem(RollOption.Need, index);
-                        ++num1;
+                        if (LootItems[index].Rolled)
+                        {
+                            ++num1;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                    else if (LootItems[index].RollState == RollState.UpToGreed && !LootItems[index].Rolled)
+                    {
+                        RollItem(RollOption.Greed, index);
+                        if (LootItems[index].Rolled)
+                        {
+
+                            ++num2;
+                        }
+                        else
+                        {
+                            return;
+                        }
                     }
                     else
                     {
-                        RollItem(RollOption.Greed, index);
-                        ++num2;
+                        RollItem(RollOption.Pass, index);
+                        if (LootItems[index].Rolled)
+                        {
+                            ++num3;
+
+                        }
                     }
-                }
-                else
-                {
-                    RollItem(RollOption.Pass, index);
-                    ++num3;
                 }
             }
             if (!config.EnableChatLogMessage)
@@ -135,6 +155,7 @@ namespace DalamudPluginProjectTemplate
                     }
                 }
             }
+
             if (!config.EnableChatLogMessage)
                 return;
             ChatGui chatGui = ChatGui;
@@ -153,6 +174,7 @@ namespace DalamudPluginProjectTemplate
             SeString seString = new(payloadList);
             chatGui.Print(seString);
         }
+
         [Command("/greed")]
         [HelpMessage("Greed on all items.")]
         public void GreedCommand(string command, string args)
@@ -164,12 +186,11 @@ namespace DalamudPluginProjectTemplate
                 if (!LootItems[index].Rolled)
                 {
                     RollItem(RollOption.Greed, index);
-                    ++num;
                 }
+                
                 else
                 {
                     RollItem(RollOption.Pass, index);
-                    ++num1;
                 }
             }
             if (!config.EnableChatLogMessage)
