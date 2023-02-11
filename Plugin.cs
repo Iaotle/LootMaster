@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace DalamudPluginProjectTemplate
 {
@@ -38,7 +39,6 @@ namespace DalamudPluginProjectTemplate
         public static List<LootItem> LootItems => ReadArray<LootItem>(lootsAddr + 16, 16).Where(i => i.Valid).ToList();
 
         public string Name => "LootMaster";
-
         public Plugin()
         {
             lootsAddr = SigScanner.GetStaticAddressFromSig("48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 89 44 24 60", 0);
@@ -46,7 +46,7 @@ namespace DalamudPluginProjectTemplate
             config = (Configuration)PluginInterface.GetPluginConfig() ?? new Configuration();
             config.Initialize(PluginInterface);
             ui = new PluginUI();
-            PluginInterface.UiBuilder.Draw += new Action(ui.Draw);
+            PluginInterface.UiBuilder.Draw += new System.Action(ui.Draw);
             PluginInterface.UiBuilder.OpenConfigUi += () =>
            {
                PluginUI ui = this.ui;
@@ -54,7 +54,6 @@ namespace DalamudPluginProjectTemplate
            };
             commandManager = new PluginCommandManager<Plugin>(this, PluginInterface);
         }
-
         private void RollItem(RollOption option, int index)
         {
             LootItem lootItem = LootItems[index];
@@ -64,7 +63,7 @@ namespace DalamudPluginProjectTemplate
 
         [Command("/need")]
         [HelpMessage("Roll need for everything. If impossible, roll greed. Else, roll pass")]
-        public void NeedCommand(string command, string args)
+        public async void NeedCommand(string command, string args)
         {
             int num1 = 0;
             int num2 = 0;
@@ -73,20 +72,44 @@ namespace DalamudPluginProjectTemplate
             {
                 if (!LootItems[index].Rolled)
                 {
-                    if (LootItems[index].RollState == RollState.UpToNeed)
+                    if (LootItems[index].RollState == RollState.UpToNeed && !LootItems[index].Rolled)
                     {
                         RollItem(RollOption.Need, index);
-                        ++num1;
+                        await Task.Delay(500);
+                        if (LootItems[index].Rolled)
+                        {
+                            ++num1;
+                        }
+                        else
+                        {
+                            RollItem(RollOption.Pass, index);
+                            ++num3;
+                        }
                     }
-                    else if (!LootItems[index].Rolled)
+                    else if (LootItems[index].RollState == RollState.UpToGreed && !LootItems[index].Rolled)
                     {
                         RollItem(RollOption.Greed, index);
-                        ++num2;
+                        await Task.Delay(500);
+                        if (LootItems[index].Rolled)
+                        {
+
+                            ++num2;
+                        }
+                        else
+                        {
+                            RollItem(RollOption.Pass, index);
+                            ++num3;
+                            
+                        }
                     }
                     else
                     {
                         RollItem(RollOption.Pass, index);
-                        ++num3;
+                        await Task.Delay(500);
+                        if (LootItems[index].Rolled)
+                        {
+                            ++num3;
+                        }
                     }
                 }
             }
@@ -115,7 +138,7 @@ namespace DalamudPluginProjectTemplate
 
         [Command("/needonly")]
         [HelpMessage("Roll need for everything. If impossible, roll greed. Else, roll pass")]
-        public void NeedOnlyCommand(string command, string args)
+        public async void NeedOnlyCommand(string command, string args)
         {
             int num1 = 0;
             int num2 = 0;
@@ -126,7 +149,16 @@ namespace DalamudPluginProjectTemplate
                     if (LootItems[index].RollState == RollState.UpToNeed)
                     {
                         RollItem(RollOption.Need, index);
-                        ++num1;
+                        await Task.Delay(500);
+                        if (LootItems[index].Rolled)
+                        {
+                            ++num1;
+                        }
+                        else
+                        {
+                            RollItem(RollOption.Pass, index);
+                            ++num2;
+                        }
                     }
                     else
                     {
@@ -135,6 +167,7 @@ namespace DalamudPluginProjectTemplate
                     }
                 }
             }
+
             if (!config.EnableChatLogMessage)
                 return;
             ChatGui chatGui = ChatGui;
@@ -153,9 +186,10 @@ namespace DalamudPluginProjectTemplate
             SeString seString = new(payloadList);
             chatGui.Print(seString);
         }
+
         [Command("/greed")]
         [HelpMessage("Greed on all items.")]
-        public void GreedCommand(string command, string args)
+        public async void GreedCommand(string command, string args)
         {
             int num = 0;
             int num1 = 0;
@@ -164,8 +198,18 @@ namespace DalamudPluginProjectTemplate
                 if (!LootItems[index].Rolled)
                 {
                     RollItem(RollOption.Greed, index);
-                    ++num;
+                    await Task.Delay(500);
+                    if (LootItems[index].Rolled)
+                    {
+                        ++num;
+                    }
+                    else
+                    {
+                        RollItem(RollOption.Pass, index);
+                        ++num1;
+                    }
                 }
+                
                 else
                 {
                     RollItem(RollOption.Pass, index);
@@ -265,7 +309,7 @@ namespace DalamudPluginProjectTemplate
                 return;
             commandManager.Dispose();
             PluginInterface.SavePluginConfig(config);
-            PluginInterface.UiBuilder.Draw -= new Action(ui.Draw);
+            PluginInterface.UiBuilder.Draw -= new System.Action(ui.Draw);
         }
 
         public void Dispose()

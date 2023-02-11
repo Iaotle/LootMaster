@@ -8,6 +8,7 @@ namespace DalamudPluginProjectTemplate
 
         public void Draw()
         {
+            var configValue = Plugin.config.EnableChatLogMessage;
             if (!IsVisible || !ImGui.Begin("LootMaster Config", ref IsVisible, (ImGuiWindowFlags)96))
                 return;
             ImGui.TextUnformatted("Features");
@@ -37,7 +38,12 @@ namespace DalamudPluginProjectTemplate
             }
             ImGui.Spacing();
             ImGui.Separator();
-            ImGui.Checkbox("Display roll information in chat.", ref Plugin.config.EnableChatLogMessage);
+            if (ImGui.Checkbox("Display roll information in chat.", ref configValue))
+            {
+                Plugin.config.EnableChatLogMessage = configValue;
+                Plugin.config.Save();
+
+            }
             ImGui.End();
         }
     }
